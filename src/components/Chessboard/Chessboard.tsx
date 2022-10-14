@@ -129,40 +129,63 @@ export default function Chessboard() {
             
             if (currentPiece) {
                 const validMove = referee.isValidMove(gridX, gridY, x, y, currentPiece.type, currentPiece.team, pieces)
-                setPieces((value)=> {
-                    const pieces = value.reduce((results, piece)=> {
-                        if (piece.x === currentPiece.x && piece.y === currentPiece.y) {
-                            piece. x = x;
-                            piece.y = y;
-                            results.push(piece)
-                        } else if (!(piece.x ===x && piece.y === y)) {
-                            results.push(piece)
-                        }
-                        return results
-                    }, [] as Piece[]);
-                    return pieces
-                })
+                if (validMove){
+                    //UPDATES PIECE POSITION
+                    //IF PIECE IS ATTACKED, REMOVES PIECE
+                    const updatedPieces = pieces.reduce((results, piece)=> {
+                                if (piece.x === currentPiece.x && piece.y === currentPiece.y) {
+                                    piece. x = x;
+                                    piece.y = y;
+                                    results.push(piece)
+                                } else if (!(piece.x ===x && piece.y === y)) {
+                                    results.push(piece)
+                                }
+                                return results
+                            }, [] as Piece[]);
+                            setPieces(updatedPieces)
+
+
+                // setPieces((value)=> {
+                //     const pieces = value.reduce((results, piece)=> {
+                //         if (piece.x === currentPiece.x && piece.y === currentPiece.y) {
+                //             piece. x = x;
+                //             piece.y = y;
+                //             results.push(piece)
+                //         } else if (!(piece.x ===x && piece.y === y)) {
+                //             results.push(piece)
+                //         }
+                //         return results
+                //     }, [] as Piece[]);
+                //     return pieces
+                // })
+            } else{
+                // RESETS PIECE POSITION
+                activePiece.style.position = "relative"
+                        activePiece.style.removeProperty("top")
+                        activePiece.style.removeProperty("left")
             }
+        
+        }
             
            
 
             //UPDATES PIECE POSITION        
-            setPieces((value)=>{
-                const pieces = value.map((p)=>{
-                    if(p.x === gridX && p.y === gridY) {
-                       const validMove = referee.isValidMove(gridX, gridY, x, y, p.type, p.team, value);
-                       if(validMove ){
-                        p.x = x
-                        p.y=y};    
-                    } else {
-                        activePiece.style.position = "relative"
-                        activePiece.style.removeProperty("top")
-                        activePiece.style.removeProperty("left")
-                    }
-                    return p
-                });
-                return pieces
-            })
+            // setPieces((value)=>{
+            //     const pieces = value.map((p)=>{
+            //         if(p.x === gridX && p.y === gridY) {
+            //            const validMove = referee.isValidMove(gridX, gridY, x, y, p.type, p.team, value);
+            //            if(validMove ){
+            //             p.x = x
+            //             p.y=y};    
+            //         } else {
+            //             activePiece.style.position = "relative"
+            //             activePiece.style.removeProperty("top")
+            //             activePiece.style.removeProperty("left")
+            //         }
+            //         return p
+            //     });
+            //     return pieces
+            // })
 
 
 

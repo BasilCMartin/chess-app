@@ -2,7 +2,7 @@ import { useRef, useState } from "react"
 import './Chessboard.css'
 import Tile from '../Tile/Tile'
 import Referee from "../../referee/Referee"
-import { verticalAxis, horizontalAxis, Piece,PieceType,TeamType, initialBoardState, Position } from "../../Constants"
+import { VERTICAL_AXIS, HORIZONTAL_AXIS, Piece,PieceType,TeamType, initialBoardState, Position, GRID_SIZE, samePosition } from "../../Constants"
 
 export default function Chessboard() {
     const [activePiece, setActivePiece] = useState<HTMLElement | null>(null)
@@ -16,11 +16,11 @@ export default function Chessboard() {
         const chessboard = chessboardRef.current
         if (element.classList.contains("chess-piece") && chessboard) {
             
-            const grabX =Math.floor((e.clientX - chessboard.offsetLeft) / 100) //49-50 turn the pixel position of grid into usable coordinate([0,0] to [8,8] )
-            const grabY = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 800) / 100)) // ^starting bottom left corner. -800 takes us from top to bottom, abs turns negative value to positive
+            const grabX =Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE) //49-50 turn the pixel position of grid into usable coordinate([0,0] to [8,8] )
+            const grabY = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE)) // ^starting bottom left corner. -800 takes us from top to bottom, abs turns negative value to positive
             setGrabPosition({x:grabX, y:grabY})
-            const x = e.clientX - 50
-            const y = e.clientY - 50
+            const x = e.clientX - GRID_SIZE/2
+            const y = e.clientY - GRID_SIZE/2
             element.style.position = "absolute"
             element.style.left = `${x}px`
             element.style.top = `${y}px`
@@ -70,28 +70,26 @@ export default function Chessboard() {
     function dropPiece(e: React.MouseEvent) {
         const chessboard = chessboardRef.current
         if (activePiece && chessboard) {
-            const x = Math.floor((e.clientX - chessboard.offsetLeft) / 100)
-            const y = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 800) / 100));
+            const x = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE)
+            const y = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE));
 
-            const currentPiece = pieces.find(p => p.position.x === grabPosition.x && p.position.y === grabPosition.y)
-            const attackedPiece = pieces.find(p => p.position.x === x && p.position.y === y)
-
+            const currentPiece = pieces.find(p => samePosition(p.position, grabPosition))
             if (currentPiece) {
-                const validMove = referee.isValidMove(grabPosition.x, grabPosition.y, x, y, currentPiece.type, currentPiece.team, pieces)
+                const validMove = referee.isValidMove(grabPosition, {x, y}, currentPiece.type, currentPiece.team, pieces)
 
-                const isEnPassantMove = referee.isEnPassantMove(grabPosition.x, grabPosition.y, x, y, currentPiece.type, currentPiece.team, pieces)
+                const isEnPassantMove = referee.isEnPassantMove(grabPosition, {x, y}, currentPiece.type, currentPiece.team, pieces)
 
 
                 const pawnDirection = currentPiece.team === TeamType.OUR ? 1 : -1
                 if (isEnPassantMove) {
                     const updatedPieces = pieces.reduce((results, piece) => {
-                        if (piece.position.x === grabPosition.x && piece.position.y === grabPosition.y) {
+                        if (samePosition(piece.position, grabPosition)) {
                             piece.enPassant = false
                             piece.position.x = x;
                             piece.position.y = y;
                             results.push(piece)
                         } else if (!(piece.position.x === x && piece.position.y === y - pawnDirection)) {
-                            if (piece.type = PieceType.PAWN) {
+                            if (piece.type === PieceType.PAWN) {
                                 piece.enPassant = false
                             }
                             results.push(piece)
@@ -104,13 +102,9 @@ export default function Chessboard() {
                     //UPDATES PIECE POSITION
                     //IF PIECE IS ATTACKED, REMOVES PIECE
                     const updatedPieces = pieces.reduce((results, piece) => {
-                        if (piece.position.x === grabPosition.x && piece.position.y === grabPosition.y) {
-                            if (Math.abs(grabPosition.x - y) === 2 && piece.type === PieceType.PAWN) {
-                                console.log("enpassant set true")
-                                piece.enPassant = true
-                            } else {
-                                piece.enPassant = false
-                            }
+                        if (samePosition(piece.position, grabPosition)) {
+                            piece.enPassant =Math.abs(grabPosition.x - y) === 2 && piece.type === PieceType.PAWN
+                    
                             piece.position.x = x;
                             piece.position.y = y;
                             results.push(piece)
@@ -143,16 +137,12 @@ export default function Chessboard() {
 
 
     let board = []
-    for (let j = verticalAxis.length - 1; j >= 0; j--) {
-        for (let i = 0; i < horizontalAxis.length; i++) {
+    for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
+        for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
             const number = j + i + 2;
-            let image = ""
-            pieces.forEach((p) => {
-                if (p.position.x === i && p.position.y === j) {
-                    image = p.image
-                }
-            })
-
+            const piece = pieces.find((p)=> p.position.x === i && p.position.y === j)
+            let image = piece? piece.image : "";
+            
             board.push(<Tile key={`${i},${j}`} image={image} number={number} />)
         }
     }

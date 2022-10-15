@@ -1,12 +1,12 @@
 import { NumericLiteral } from "typescript"
-import { PieceType, TeamType, Piece } from "../components/Chessboard/Chessboard"
+import { PieceType, TeamType, Piece } from "../Constants"
 
 export default class Referee {
 
     tileIsOccupied(x:number, y:number, boardState:Piece[]): boolean {
        // console.log("🚀 ~ file: Referee.ts ~ line 6 ~ Referee ~ tileIsOccupied ~ boardState", boardState)
         
-const piece= boardState.find((p)=>p.x===x&&p.y===y)
+const piece= boardState.find((p)=>p.position.x===x&&p.position.y===y)
 
         console.log("checking if tile is occupied...")
         if(piece){return true}
@@ -15,7 +15,7 @@ const piece= boardState.find((p)=>p.x===x&&p.y===y)
 
     tileIsOccupiedByOpponent(x:number, y:number,boardState:Piece[], team:TeamType): boolean {
 
-const piece = boardState.find((p)=> p.x===x && p.y === y && p.team !==team)
+const piece = boardState.find((p)=> p.position.x===x && p.position.y === y && p.team !==team)
 
         if (piece) {
             return true
@@ -30,7 +30,7 @@ const piece = boardState.find((p)=> p.x===x && p.y === y && p.team !==team)
 
 if (type === PieceType.PAWN) {
      if ((x-px === -1 || x-px ===1) && y-py === pawnDirection) {
-        const piece = boardState.find(p=> p.x === x && p.y === y - pawnDirection && p.enPassant)
+        const piece = boardState.find(p=> p.position.x === x && p.position.y === y - pawnDirection && p.enPassant)
         if (piece) {
             return true
         }

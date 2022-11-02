@@ -105,6 +105,40 @@ return false
             }
         }
 
+        else if(type === PieceType.BISHOP) {
+
+            for (let i = 1; i< 8; i++) {
+                console.log("looping")
+                if (desiredPosition.x-initialPosition.x === i && desiredPosition.y - initialPosition.y === i) {
+                    console.log(`moving up right ${i} squares diagonal`)
+                    break;
+                }
+            }
+            for (let i = 1; i< 8; i++) {
+                console.log("looping")
+                if (desiredPosition.x-initialPosition.x === i && desiredPosition.y - initialPosition.y === -i) {
+                    console.log(`moving down right ${i} squares diagonal`)
+                    break;
+                }
+            }
+            for (let i = 1; i< 8; i++) {
+                console.log("looping")
+                if (desiredPosition.x-initialPosition.x === -i && desiredPosition.y - initialPosition.y === -i) {
+                    console.log(`moving down left ${i} squares diagonal`)
+                    break;
+                }
+            }
+            for (let i = 1; i< 8; i++) {
+                console.log("looping")
+                if (desiredPosition.x-initialPosition.x === -i && desiredPosition.y - initialPosition.y === i) {
+                    console.log(`moving up left ${i} squares diagonal`)
+                    break;
+                }
+            }
+            
+
+        }
+
 
     
 
